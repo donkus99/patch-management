@@ -1,0 +1,66 @@
+---
+#### Ansible Playbook to perform Kernel Patching on Ubuntu Servers ####
+
+- hosts: web1
+  become: yes
+  become_user: root
+
+  tasks:
+
+    - name:  Task 1 - verify web/database processes are not running
+      shell: if ps -eaf | egrep 'apache|http|nginx|mysql|postgresql|mariadb'|grep -v grep > /dev/null ;then echo 'process_running';else echo 'process_not_running';fi
+      ignore_errors: true
+      register: app_process_check
+
+    - name:  Task 2 - decision point to start patching
+      fail: msg="{{ inventory_hostname }} have running Application. Please stop the application processes first, then attempt patching."
+      when: app_process_check.stdout == "process_running"
+
+    - name:  Task 3 - upgrade kernel package on Ubuntu server
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+        cache_valid_time: 3600
+        name: linux-image-generic
+        state: latest
+      when: app_process_check.stdout == "process_not_running" and ansible_distribution == 'Ubuntu'
+      register: apt_update
+
+    - name:  Update apt repo and package cache
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+        cache_valid_time: 3600
+
+    - name:  Upgrade all packages
+      apt:
+        upgrade: dist
+        force_apt_get: yes
+
+    - name: Task 4 - Check if a reboot is needed on all servers
+      register: reboot_required_file_existence
+      stat: path=/var/run/reboot-required get_md5=no
+
+    - name: Task 5 - Reboot servers if kernel is updated
+      reboot:
+        msg: "Rebooting the servers after applying Kernel Updates"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: uptime
+      when: reboot_required_file_existence.stat.exists
+
+    - name: Task 6 - pause for 180 secs
+      pause:
+        minutes: 3
+
+    - name: Task 7 - check if all the systems responding to ssh
+      local_action:
+        module: wait_for
+          host={{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}
+          port=22
+          search_regex=OpenSSH
+          delay=15
+          timeout=300
+          state=started
