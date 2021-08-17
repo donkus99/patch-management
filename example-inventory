@@ -1,0 +1,11 @@
+[webserver]
+web1 ansible_host=192.168.1.15 ansible_port=69
+web2 ansible_host=DonHosts-2
+web3 ansible_host=DonHosts-3
+[dbserver]
+db1 ansible_host=DonHosts-4
+db2 ansible_host=DonHosts-5
+[app]
+app1 ansible_host=DonHost-6
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
