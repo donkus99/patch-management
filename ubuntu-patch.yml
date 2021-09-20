@@ -1,7 +1,7 @@
 ---
 #### Ansible Playbook to perform Kernel Patching on Ubuntu Servers ####
 
-- hosts: web1
+- hosts: all
   become: yes
   become_user: root
 
