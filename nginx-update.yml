@@ -1,5 +1,5 @@
 ---
-- hosts: app
+- hosts: all
   become_user: root
   tasks:
     - name: Update the repository cache and update package "nginx" to latest version using default release focal-backport
