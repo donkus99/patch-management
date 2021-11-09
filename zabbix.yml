@@ -6,5 +6,26 @@
   tasks:
      - name: Download zabbix repo package
        get_url:
-         url: "{{ zabbix_repo_url}}"
+         url: https://repo.zabbix.com/zabbix/5.2/ubuntu/pool/main/z/zabbix-release/zabbix-release_5.2-1%2Bubuntu20.04_all.deb
          dest: /tmp/zabbix.deb
+         
+      - name: Install zabbix repo
+        become: yes
+        apt:
+            deb: /tmp/zabbix.deb
+            state: present
+            
+      - name: Install zabbix agent
+        become: yes
+        apt:
+            name: zabbix-agent
+            state: present
+            update_cache: yes
+            
+      - name: Copy file with owner and permissions
+        ansible.builtin.copy:
+        src: /home/redhat/test
+        dest: /etc/zabbix/zabbix_agentd.conf
+        owner: root
+        group: root
+        mode: '0644'
