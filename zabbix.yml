@@ -1,0 +1,10 @@
+---
+#### Ansible Playbook to perform Kernel Patching on Ubuntu Servers ####
+
+- hosts: tepub02hvza06
+  remote_user: ubuntu
+  tasks:
+     - name: Download zabbix repo package
+       get_url:
+         url: "{{ zabbix_repo_url}}"
+         dest: /tmp/zabbix.deb
