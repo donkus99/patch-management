@@ -4,16 +4,15 @@
 - hosts: tepub02hvza06
   remote_user: ubuntu
   tasks:
-     - name: Download zabbix repo package
-       get_url:
-         url: https://repo.zabbix.com/zabbix/5.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_5.0-1+$(lsb_release -sc)_all.deb
-         dest: /tmp/zabbix.deb
-         
-      - name: Install zabbix repo
-        become: yes
-        apt:
-            deb: /tmp/zabbix.deb
-            state: present
+#     - name: Download zabbix repo package
+#       get_url:
+#         url: https://repo.zabbix.com/zabbix/5.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_5.0-1+$(lsb_release -sc)_all.deb
+
+#      - name: Install zabbix repo
+#        become: yes
+#        apt:
+#            deb: /tmp/zabbix.deb
+#            state: present
             
       - name: Install zabbix agent
         become: yes
